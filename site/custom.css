@@ -791,6 +791,22 @@ main > section:nth-of-type(7) p {
   line-height: 1.7 !important;
 }
 
+/* Fallback: target the CTA section by actual class names in case nth-of-type count is off */
+section[class*="from-blue-700"] h1,
+section[class*="from-blue-700"] h2,
+section[class*="from-blue-700"] h3,
+section[class*="to-blue-900"] h1,
+section[class*="to-blue-900"] h2,
+section[class*="to-blue-900"] h3 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+section[class*="from-blue-700"] p,
+section[class*="to-blue-900"] p {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
 /* --------------------------------------------------------------------------
    13. FOOTER
    Actual: <footer class="bg-gray-900 text-gray-400 py-12">
