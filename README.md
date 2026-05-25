@@ -7,8 +7,27 @@ PDF 사업 보고서를 바탕으로 매일 오전 09:00(KST)에 X/Twitter, Thre
 - `scripts/post_daily.py`: 콘텐츠 선택, 중복 게시 방지, 플랫폼별 API 게시
 - `content/daily_posts.json`: 보고서 기반 일일 경험담 콘텐츠 뱅크
 - `content/report_summary.md`: PDF에서 추출한 브랜드/사업 요약
+- `site/`: Cloudflare Pages에 배포할 정적 랜딩페이지
 - `.github/workflows/daily-social.yml`: GitHub Actions 예약 실행, 매일 00:00 UTC
 - `.env.example`: 로컬 실행 및 GitHub Secrets 입력값 예시
+
+## 웹사이트 배포
+
+Cloudflare Pages에서 무료 기본 도메인으로 배포할 수 있습니다.
+
+1. Cloudflare Dashboard > Workers & Pages > Create application > Pages로 이동합니다.
+2. GitHub 저장소 `problemsolverdenny/landingpage`를 연결합니다.
+3. 프로젝트 이름을 `problemsolverdenny`로 입력합니다. 사용 가능하면 URL은 `https://problemsolverdenny.pages.dev`가 됩니다.
+4. 빌드 설정은 아래처럼 둡니다.
+
+```text
+Framework preset: None
+Build command: 비워둠
+Build output directory: site
+Root directory: /
+```
+
+`site/`는 Manus에서 만든 랜딩페이지의 정적 배포본입니다. Manus 편집/분석 스크립트는 제거했고, 필요한 이미지 자산은 `site/assets/`에 포함했습니다.
 
 ## 빠른 테스트
 
