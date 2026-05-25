@@ -1,6 +1,7 @@
 (function () {
   const reviewId = "physical-therapy-review";
   const caseId = "physical-therapy-case";
+  const proofId = "denny-proof-strip";
   let attempts = 0;
 
   function findSectionByHeading(text) {
@@ -119,12 +120,34 @@
     return true;
   }
 
+  function addHeroProof() {
+    if (document.getElementById(proofId)) return true;
+
+    const hero = document.querySelector("main > section:first-child");
+    const intro = hero && hero.querySelector("p");
+    if (!intro) return false;
+
+    const proof = document.createElement("div");
+    proof.id = proofId;
+    proof.className = "denny-proof-strip";
+    proof.innerHTML = [
+      "<div><strong>96.7%</strong><span>외주 실패 비용 절감 사례</span></div>",
+      "<div><strong>4,000만원</strong><span>MVP 견적 재설계 경험</span></div>",
+      "<div><strong>PhD</strong><span>연구 플랫폼 구축 진행</span></div>",
+    ].join("");
+
+    intro.insertAdjacentElement("afterend", proof);
+
+    return true;
+  }
+
   function applyUpdates() {
     attempts += 1;
+    const proofAdded = addHeroProof();
     const reviewAdded = addCustomerReview();
     const caseAdded = addCaseStudy();
 
-    if ((!reviewAdded || !caseAdded) && attempts < 30) {
+    if ((!proofAdded || !reviewAdded || !caseAdded) && attempts < 30) {
       window.setTimeout(applyUpdates, 100);
     }
   }
