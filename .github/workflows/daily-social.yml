@@ -1,0 +1,52 @@
+name: Daily social publishing
+
+on:
+  schedule:
+    # 09:00 Asia/Seoul == 00:00 UTC.
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Publish daily social post
+        env:
+          ENABLED_PLATFORMS: threads
+          REQUIRE_ALL_PLATFORMS: "true"
+          CONTENT_SOURCE: openai
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-5-nano
+          OPENAI_REASONING_EFFORT: low
+          OPENAI_MAX_OUTPUT_TOKENS: "1400"
+          OPENAI_API_APPROVED: "true"
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+          THREADS_USER_ID: me
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_IMAGE_URL: ${{ secrets.INSTAGRAM_IMAGE_URL }}
+          GRAPH_API_VERSION: ${{ secrets.GRAPH_API_VERSION }}
+        run: python scripts/post_daily.py --publish
+
+      - name: Persist post log
+        run: |
+          if [[ -n "$(git status --short data/post_log.jsonl)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/post_log.jsonl
+            git commit -m "chore: log daily social post"
+            git push
+          fi
