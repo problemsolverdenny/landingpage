@@ -50,6 +50,16 @@
       }
     });
 
+    document.querySelectorAll("footer .border-t p").forEach(function (paragraph) {
+      if (paragraph.querySelector("a[href='/privacy.html']")) {
+        return;
+      }
+      paragraph.insertAdjacentHTML(
+        "beforeend",
+        ' · <a class="hover:text-white transition" href="/privacy.html">Privacy Policy</a>',
+      );
+    });
+
     document.querySelectorAll("h4").forEach(function (heading) {
       if (heading.textContent && heading.textContent.trim() === "Follow") {
         var container = heading.parentElement;
