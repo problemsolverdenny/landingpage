@@ -1,5 +1,6 @@
 (function () {
   var email = "problemsolver.denny@gmail.com";
+  var bookingUrl = "https://whattime.co.kr/problemsolver-denny";
   var subject = encodeURIComponent("MVP 상담 문의");
   var mailto = "mailto:" + email + "?subject=" + subject;
   var socials = {
@@ -15,20 +16,27 @@
     link.rel = "noopener noreferrer";
   }
 
+  function buttonLabel(button) {
+    return button.textContent ? button.textContent.trim() : "";
+  }
+
+  function openExternal(url) {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
   function wireContact() {
     document.querySelectorAll("button").forEach(function (button) {
-      if (button.textContent && button.textContent.trim() === "무료 상담 신청") {
+      var label = buttonLabel(button);
+      if (
+        label === "무료 상담 신청" ||
+        label === "컨설팅 받기" ||
+        label === "Contact"
+      ) {
         button.type = "button";
-        button.addEventListener("click", function () {
-          window.location.href = mailto;
-        });
       }
 
-      if (button.textContent && button.textContent.trim() === "SNS에서 팔로우") {
+      if (label === "SNS에서 팔로우") {
         button.type = "button";
-        button.addEventListener("click", function () {
-          window.open(socials.Threads, "_blank", "noopener,noreferrer");
-        });
       }
     });
 
@@ -92,6 +100,29 @@
   } else {
     wireContact();
   }
+
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest("button");
+    if (!button) {
+      return;
+    }
+
+    var label = buttonLabel(button);
+    if (
+      label === "무료 상담 신청" ||
+      label === "컨설팅 받기" ||
+      label === "Contact"
+    ) {
+      event.preventDefault();
+      openExternal(bookingUrl);
+      return;
+    }
+
+    if (label === "SNS에서 팔로우") {
+      event.preventDefault();
+      openExternal(socials.Threads);
+    }
+  });
 
   new MutationObserver(wireContact).observe(document.documentElement, {
     childList: true,
