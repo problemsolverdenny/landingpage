@@ -24,13 +24,27 @@
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
+  function scrollToHeading(text) {
+    var target = null;
+    document.querySelectorAll("h2").forEach(function (heading) {
+      if (!target && heading.textContent && heading.textContent.trim() === text) {
+        target = heading.closest("section") || heading;
+      }
+    });
+
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   function wireContact() {
     document.querySelectorAll("button").forEach(function (button) {
       var label = buttonLabel(button);
       if (
         label === "무료 상담 신청" ||
         label === "컨설팅 받기" ||
-        label === "Contact"
+        label === "Contact" ||
+        label === "내 이야기 보기"
       ) {
         button.type = "button";
       }
@@ -115,6 +129,12 @@
     ) {
       event.preventDefault();
       openExternal(bookingUrl);
+      return;
+    }
+
+    if (label === "내 이야기 보기") {
+      event.preventDefault();
+      scrollToHeading("Denny에 대해");
       return;
     }
 
