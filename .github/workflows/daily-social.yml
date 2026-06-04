@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: daily-social-publishing
+  cancel-in-progress: false
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -48,5 +52,6 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add data/post_log.jsonl
             git commit -m "chore: log daily social post"
+            git pull --rebase origin "$GITHUB_REF_NAME"
             git push
           fi
