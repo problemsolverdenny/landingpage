@@ -86,10 +86,14 @@ OpenAI 생성은 `content/report_summary.md`와 해당 날짜의 `content/daily_
 
 - `OPENAI_API_KEY`
 - `THREADS_ACCESS_TOKEN`
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
 
 워크플로는 매일 `00:00 UTC`, 즉 한국시간 `09:00`에 실행됩니다. GitHub Actions 스케줄은 몇 분 지연될 수 있습니다.
 
 현재 예약 워크플로는 Threads 전용으로 고정되어 있으며, 매일 OpenAI `gpt-5-nano`로 새 글을 생성한 뒤 Threads에 게시합니다. OpenAI API는 토큰 사용량 기준 비용이 발생할 수 있습니다.
+
+Cloudflare Worker 배포 워크플로는 `main` 또는 `master` 브랜치에 `site/`, `src/`, `wrangler.jsonc` 변경이 push될 때 실행됩니다. GitHub Actions에서 수동 실행하려면 `Deploy Cloudflare Worker` 워크플로의 `workflow_dispatch`를 사용하세요.
 
 예약 실행 기본값:
 
