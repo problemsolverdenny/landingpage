@@ -1,6 +1,6 @@
 (function () {
   var email = "problemsolver.denny@gmail.com";
-  var bookingUrl = "https://whattime.co.kr/problemsolver-denny";
+  var bookingUrl = "https://cal.com/denny-dgbpgl";
   var subject = encodeURIComponent("MVP 상담 문의");
   var mailto = "mailto:" + email + "?subject=" + subject;
   var socials = {
