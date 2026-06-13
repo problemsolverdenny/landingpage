@@ -139,6 +139,38 @@ def platform_character_limit(platforms: list[str]) -> int:
     return min(limits[platform] for platform in platforms)
 
 
+_WRITING_STYLES = [
+    "짧은 에피소드: 실제 상담 장면 하나를 짧게 재현하고 그 상황에서 배운 점으로 마무리합니다.",
+    "질문형 오프닝: 초기 창업자가 자주 하는 질문 하나로 시작해 Denny의 답변으로 이어갑니다.",
+    "숫자 중심: 구체적인 금액·기간·비율 등 숫자를 앞에 내세워 독자의 시선을 먼저 잡습니다.",
+    "실수 고백: Denny 본인 또는 고객이 저질렀던 실수를 솔직하게 털어놓고 교훈으로 연결합니다.",
+    "한 줄 원칙: 핵심 판단 기준 하나를 뽑아 그 이유와 사례를 간결하게 풀어냅니다.",
+    "대화 재현: 고객과 나눈 짧은 대화를 그대로 옮기고 그 대화가 왜 중요했는지 설명합니다.",
+]
+
+
+def writing_style_for_date(date_text: str) -> str:
+    current = datetime.strptime(date_text, "%Y-%m-%d").date()
+    index = current.toordinal() % len(_WRITING_STYLES)
+    return _WRITING_STYLES[index]
+
+
+def load_recent_post_titles(n: int = 7) -> list[str]:
+    if not LOG_FILE.exists():
+        return []
+    titles: list[str] = []
+    for line in LOG_FILE.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            entry = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if entry.get("status") == "success" and entry.get("title"):
+            titles.append(entry["title"])
+    return list(dict.fromkeys(reversed(titles)))[:n]
+
+
 def generate_openai_post(date_text: str, platforms: list[str], seed_post: SocialPost) -> SocialPost:
     require_env(["OPENAI_API_KEY"])
     if not bool_env("OPENAI_API_APPROVED", False):
@@ -149,6 +181,15 @@ def generate_openai_post(date_text: str, platforms: list[str], seed_post: Social
     model = env("OPENAI_MODEL", "gpt-5-nano")
     max_chars = platform_character_limit(platforms)
     summary = load_report_summary()
+    style = writing_style_for_date(date_text)
+    recent_titles = load_recent_post_titles()
+    recent_block = (
+        "최근 게시된 포스트 제목 (이 소재와 관점은 반복하지 마세요):\n"
+        + "\n".join(f"- {t}" for t in recent_titles)
+        if recent_titles
+        else ""
+    )
+
     prompt = f"""
 날짜: {date_text}
 게시 플랫폼: {", ".join(platforms)}
@@ -157,19 +198,19 @@ def generate_openai_post(date_text: str, platforms: list[str], seed_post: Social
 브랜드/사업 요약:
 {summary}
 
-오늘의 소재:
-제목: {seed_post.title}
-초안: {seed_post.text}
+오늘의 글쓰기 스타일:
+{style}
 
-아래 3단 구조를 반드시 지켜 한국어 SNS 콘텐츠를 작성해 주세요.
-1. 플랫폼 외주 개발 예시
-2. 해당 예시에서의 문제점
-3. 해결했던 방법
+오늘의 주제 키워드: {seed_post.title}
+
+{recent_block}
+
+위 스타일과 주제를 바탕으로 Threads에 올릴 한국어 SNS 콘텐츠를 자유롭게 작성해 주세요.
 
 요구사항:
 - Denny 본인의 경험담처럼 1인칭으로 작성합니다.
-- 과장된 광고 문구보다 실제 상담/문제 해결 사례처럼 씁니다.
-- Threads에 바로 올릴 수 있게 줄바꿈을 포함합니다.
+- 과장된 광고 문구 없이 실제 사례처럼 씁니다.
+- 줄바꿈을 포함해 Threads에 바로 올릴 수 있는 형태로 작성합니다.
 - 전체 본문은 최대 글자 수를 넘기지 않습니다.
 - JSON만 반환합니다.
 """.strip()
